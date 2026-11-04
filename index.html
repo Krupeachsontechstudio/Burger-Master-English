@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Burger Master English!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ THEME ============ */
+:root{
+  --cream:#fff7ec; --cream2:#ffeeda; --red:#e2474b; --red-d:#b8333a; --yellow:#ffc93c; --yellow-d:#e8960f;
+  --green:#5cbf3f; --green-d:#3d8f27; --pink:#f8d9d6; --pink-d:#e7b2ab; --brown:#5a2d16; --brown2:#8a4a26;
+  --sky1:#9fd8ff; --sky2:#ffe9d0; --ink:#4a2a18;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'Fredoka','Mali','Noto Sans SC','PingFang SC',system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 20% 10%,#ffe3d8,transparent 40%),radial-gradient(circle at 90% 90%,#ffd9c2,transparent 45%),#f6c9be;
+  min-height:100vh;overflow-x:hidden;user-select:none}
+button{font-family:inherit;color:inherit;cursor:pointer}
+#root{max-width:1200px;margin:0 auto;padding:12px;min-height:100vh}
+
+/* ============ COMMON UI ============ */
+.panel{background:linear-gradient(#fff9f1,#fff0e2);border:4px solid #f3c2b5;border-radius:26px;box-shadow:0 6px 0 #dfa594,0 12px 30px rgba(120,40,20,.15);padding:18px;position:relative}
+.ribbon{display:inline-block;position:relative;background:linear-gradient(#f0656a,var(--red-d));color:#fff;font-weight:700;font-size:clamp(20px,3.4vw,32px);
+  padding:6px 34px;border-radius:14px;border:3px solid #fff;box-shadow:0 4px 0 #8d2229;text-shadow:0 2px 0 #8d2229,0 0 2px #8d2229;letter-spacing:.5px}
+.ribbon.small{font-size:clamp(13px,2vw,18px);padding:4px 18px}
+.title-row{text-align:center;margin:-6px 0 16px}
+.btn{border:3px solid var(--brown);border-radius:999px;padding:10px 22px;font-weight:600;font-size:18px;background:linear-gradient(#fffaf2,#f7e2c9);
+  box-shadow:0 5px 0 #b98a66;transition:transform .08s,box-shadow .08s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #b98a66}
+.btn.yellow{background:linear-gradient(#ffe58a,#ffb928);box-shadow:0 6px 0 #c77a0b}
+.btn.green{background:linear-gradient(#8be26b,#45a82c);color:#fff;text-shadow:0 2px 0 #2c6c1b;box-shadow:0 5px 0 #2f7a1d}
+.btn.red{background:linear-gradient(#ff8a8d,#e2474b);color:#fff;text-shadow:0 2px 0 #8d2229;box-shadow:0 5px 0 #8d2229}
+.btn.big{font-size:clamp(26px,4vw,38px);padding:10px 46px}
+.btn:disabled{filter:grayscale(.8);opacity:.6;cursor:not-allowed}
+.ibtn{width:48px;height:48px;border-radius:50%;border:3px solid var(--brown);background:linear-gradient(#f59f8b,#d9604f);font-size:22px;box-shadow:0 4px 0 #8d3a2a;display:inline-flex;align-items:center;justify-content:center}
+.ibtn:active{transform:translateY(3px);box-shadow:0 1px 0 #8d3a2a}
+.coinpill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--brown);border-radius:999px;padding:4px 14px 4px 8px;font-weight:700;font-size:18px;box-shadow:0 3px 0 #b98a66}
+.topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.spacer{flex:1}
+.muted{opacity:.7}
+.center{text-align:center}
+.stars{color:#ffbf1f;letter-spacing:2px;text-shadow:0 2px 0 #c77a0b;font-size:22px}
+.stars .off{color:#e8d8c8;text-shadow:none}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:var(--brown);color:#fff;padding:10px 20px;border-radius:999px;font-weight:600;z-index:99;transition:transform .3s;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#modal{position:fixed;inset:0;background:rgba(70,30,15,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+#modal.show{display:flex}
+#modal .panel{max-width:560px;width:100%;max-height:92vh;overflow:auto;animation:popin .25s}
+@keyframes popin{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.seg button{border:3px solid var(--brown);border-radius:999px;padding:6px 14px;background:#fff;font-weight:600;font-size:15px}
+.seg button.on{background:var(--yellow);box-shadow:inset 0 -3px 0 #e8960f}
+label.lb{font-weight:700;display:block}
+
+/* ============ HOME ============ */
+.home{position:relative;min-height:calc(100vh - 24px);border-radius:28px;overflow:hidden;border:4px solid #fff;box-shadow:0 10px 30px rgba(120,40,20,.25)}
+.home .sky{position:absolute;inset:0;background:linear-gradient(#8fd0ff 0%,#cdeaff 40%,#ffe8cf 75%,#f4c79a 100%)}
+.home .city i{position:absolute;bottom:22%;background:linear-gradient(#c9b4d8,#a891bf);border-radius:6px 6px 0 0;opacity:.55}
+.home .city i::after{content:"";position:absolute;inset:10px 8px;background:repeating-linear-gradient(0deg,transparent 0 10px,rgba(255,255,255,.5) 10px 14px),repeating-linear-gradient(90deg,transparent 0 8px,rgba(160,140,190,.9) 8px 14px);opacity:.6}
+.home .ground{position:absolute;left:0;right:0;bottom:0;height:24%;background:linear-gradient(#e9c49c,#d9a878)}
+.home .tree{position:absolute;bottom:20%;width:120px;height:140px}
+.home .tree::before{content:"";position:absolute;bottom:0;left:52px;width:16px;height:60px;background:#8a5a33;border-radius:4px}
+.home .tree::after{content:"";position:absolute;top:0;left:0;width:120px;height:100px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#9ddc6a,#5aa83a)}
+.store{position:absolute;left:2%;bottom:22%;width:min(36%,380px);height:52%;background:linear-gradient(#f3b39a,#e2917a);border-radius:14px 14px 0 0;border:4px solid #b9604a}
+.store .sign{position:absolute;top:-30px;left:10%;right:10%;background:linear-gradient(#e2474b,#b8333a);color:#fff;border:4px solid #fff3e0;border-radius:16px;text-align:center;font-weight:700;font-size:clamp(14px,2.2vw,26px);line-height:1;padding:8px;box-shadow:0 4px 0 #7a1f25;transform:rotate(-4deg)}
+.store .awning{position:absolute;top:30%;left:-4%;right:-4%;height:16%;background:repeating-linear-gradient(90deg,#e2474b 0 24px,#fff 24px 48px);border-radius:0 0 18px 18px;border:3px solid #b8333a;box-shadow:0 6px 0 rgba(0,0,0,.08)}
+.store .win{position:absolute;top:52%;left:8%;right:8%;bottom:0;background:linear-gradient(#ffe9a8,#ffc76a);border:4px solid #8a4a26;border-bottom:0;border-radius:10px 10px 0 0;box-shadow:inset 0 0 30px rgba(255,170,60,.8)}
+.home .topL{position:absolute;top:14px;left:14px;z-index:5}
+.home .topR{position:absolute;top:14px;right:14px;z-index:5;display:flex;gap:8px}
+.home .main{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 12px 30px}
+.logo{text-align:center;position:relative;margin-bottom:6px}
+.logo .crown{font-size:44px;margin-bottom:-18px;animation:bob 2s ease-in-out infinite}
+.logo .l1,.logo .l2{font-weight:700;line-height:.95;letter-spacing:1px;
+  text-shadow:4px 0 0 var(--brown),-4px 0 0 var(--brown),0 4px 0 var(--brown),0 -4px 0 var(--brown),3px 3px 0 var(--brown),-3px -3px 0 var(--brown),3px -3px 0 var(--brown),-3px 3px 0 var(--brown),0 9px 0 #7a3a18}
+.logo .l1{font-size:clamp(48px,9vw,96px);color:#ffcb2f}
+.logo .l2{font-size:clamp(56px,10.5vw,112px);color:#fff}
+.logo .l2 b{color:#ffcb2f}
+.logo .eng{position:absolute;right:-8px;top:24px;background:#5cbf3f;color:#fff;border:3px solid #fff;border-radius:12px;padding:2px 10px;font-weight:700;transform:rotate(12deg);box-shadow:0 3px 0 #2f7a1d;font-size:clamp(14px,2vw,20px)}
+.home .chef{position:absolute;bottom:4%;z-index:2;width:min(28%,300px)}
+.home .chefL{left:3%}
+.home .chefR{right:3%;width:min(22%,240px)}
+.home .chef .chibi{width:100%;height:auto;filter:drop-shadow(0 8px 10px rgba(80,30,10,.25))}
+.home .plate{position:absolute;right:-12%;top:52%;font-size:clamp(40px,7vw,84px);animation:bob 2.4s ease-in-out infinite}
+.home .row3{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.home .row3 .btn{font-size:16px;padding:8px 16px}
+.sparkle{position:absolute;color:#fff;font-size:24px;animation:twinkle 1.8s ease-in-out infinite;z-index:2;text-shadow:0 0 8px #ffe680}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:999px;font-size:12px;padding:2px 7px;border:2px solid #fff}
+@media (max-width:760px){
+  .home .chef{opacity:.35;width:44%}
+  .home .chefR{width:36%}
+  .store{width:60%;opacity:.5}
+}
+
+/* ============ 3D HERO (artwork) ============ */
+.hero{position:relative;width:100%;aspect-ratio:1093/653;border-radius:28px;overflow:hidden;border:5px solid #fff;box-shadow:0 10px 0 #e2a597,0 18px 40px rgba(120,40,20,.25);
+  background:url(img/hero.webp) center/cover;max-width:calc((100vh - 130px)*1.674);margin:0 auto}
+.hs{position:absolute;background:transparent;border:0;border-radius:999px;transition:transform .12s,box-shadow .12s}
+.hs:hover{box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 24px rgba(255,220,120,.9);transform:scale(1.04)}
+.hs:active{transform:scale(.96)}
+.hs.round{border-radius:50%}
+.hero .eng{position:absolute;left:76%;top:5%;background:linear-gradient(#8be26b,#3a9a22);color:#fff;border:3px solid #fff;border-radius:14px;padding:2px 12px;font-weight:700;
+  transform:rotate(12deg);box-shadow:0 4px 0 #2f7a1d;font-size:clamp(12px,2vw,22px)}
+.hero .mutex{position:absolute;left:93.4%;top:2.6%;font-size:clamp(14px,2.2vw,26px);pointer-events:none}
+.home-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.cface{width:100%;height:100%;object-fit:cover;border-radius:16px;border:3px solid #fff;box-shadow:0 4px 10px rgba(120,50,20,.2)}
+.mood{position:absolute;right:-6px;top:-6px;font-size:28px;animation:bob 1s infinite}
+.ingimg{width:58px;height:34px;object-fit:contain;filter:drop-shadow(0 3px 2px rgba(90,40,10,.25))}
+.ing .e{filter:drop-shadow(0 3px 2px rgba(90,40,10,.3))}
+.lvlimg{height:110px;filter:drop-shadow(0 8px 8px rgba(90,40,10,.25));border-radius:18px}
+.giftimg{width:170px;display:block;margin:0 auto;border-radius:20px;animation:bob 2s infinite}
+.bigburger{width:150px;display:block;margin:0 auto 6px;border-radius:20px;box-shadow:0 6px 16px rgba(120,50,20,.25)}
+
+/* ============ LEVEL SELECT ============ */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.lvl{background:#fff;border:3px solid #f0c3b3;border-radius:22px;padding:14px;text-align:center;box-shadow:0 5px 0 #e2b0a0;transition:transform .15s}
+.lvl:hover{transform:translateY(-4px)}
+.lvl h3{margin:6px 0 2px;font-size:22px}
+.lvl .learn{font-size:14px;opacity:.8;min-height:36px}
+.lvl .ex{font-size:13px;background:var(--cream2);border-radius:12px;padding:6px;margin:8px 0;min-height:42px}
+.lvl.locked{filter:grayscale(.9);opacity:.7}
+.mini-wrap{height:120px;display:flex;align-items:flex-end;justify-content:center}
+
+/* ============ BURGER LAYERS ============ */
+.stack{display:flex;flex-direction:column-reverse;align-items:center;width:min(230px,58vw)}
+.stack.mini{width:120px}
+.ly{width:96%;margin-top:-3px;position:relative}
+.ly.new{animation:drop .32s cubic-bezier(.3,1.6,.6,1)}
+@keyframes drop{from{transform:translateY(-70px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+.ly-bunb{height:32px;width:92%;border-radius:8px 8px 32px 32px;background:linear-gradient(#fbe2a6 0%,#f5c06a 25%,#e39a3a 70%,#c97a22 100%);box-shadow:inset 0 -6px 0 #b86f1d,0 6px 8px rgba(90,40,10,.25)}
+.ly-bunt{height:58px;width:94%;border-radius:120px 120px 14px 14px;background:
+  radial-gradient(ellipse 4px 2.5px at 30% 30%,#fff6d8 98%,transparent),radial-gradient(ellipse 4px 2.5px at 55% 20%,#fff6d8 98%,transparent),
+  radial-gradient(ellipse 4px 2.5px at 72% 38%,#fff6d8 98%,transparent),radial-gradient(ellipse 4px 2.5px at 42% 50%,#fff6d8 98%,transparent),
+  radial-gradient(ellipse 4px 2.5px at 20% 55%,#fff6d8 98%,transparent),radial-gradient(ellipse 4px 2.5px at 82% 58%,#fff6d8 98%,transparent),
+  radial-gradient(ellipse 30% 22% at 34% 26%,rgba(255,255,255,.55),transparent),linear-gradient(#ffd98a 0%,#f6b955 40%,#e0902e 85%,#c9781f 100%);box-shadow:inset 0 -7px 0 #c9781f,inset -10px -6px 18px rgba(170,90,20,.35),0 4px 6px rgba(90,40,10,.2)}
+.mini .ly-bunt{height:30px}.mini .ly-bunb{height:16px}.mini .ly-patty{height:13px}.mini .ly-cheese{height:9px}.mini .ly-lettuce{height:9px}.mini .ly-tomato{height:7px}.mini .ly-egg{height:9px}.mini .ly-pickle{height:6px}.mini .ly-onion{height:6px}
+.ly-patty{height:28px;border-radius:18px;background:radial-gradient(circle at 30% 40%,#9a5a32 2px,transparent 3px) 0 0/14px 10px,linear-gradient(#8a4b28 0%,#6a3519 50%,#46200d 100%);box-shadow:inset 0 -5px 0 #3e1d0c,inset 0 4px 4px rgba(255,200,160,.35),0 3px 4px rgba(0,0,0,.25)}
+.ly-cheese{height:18px;width:100%;background:linear-gradient(#fff0a0 0%,#ffd84a 30%,#ffb81f 100%);clip-path:polygon(0 0,100% 0,100% 55%,88% 55%,84% 100%,79% 55%,52% 55%,47% 90%,42% 55%,18% 55%,14% 100%,10% 55%,0 55%)}
+.ly-lettuce{height:16px;width:100%;background:radial-gradient(circle at 8px 9px,#5bb03d 7px,transparent 8px) 0 0/16px 16px repeat-x,linear-gradient(#a6ee7e,#5bb03d) top/100% 9px no-repeat;filter:drop-shadow(0 2px 2px rgba(30,80,10,.35))}
+.ly-tomato{height:14px;width:88%;border-radius:10px;background:radial-gradient(ellipse 14px 4px at 50% 30%,rgba(255,255,255,.45),transparent) 0 0/46px 100%,repeating-linear-gradient(90deg,#f0544a 0 43px,#b8241e 43px 46px);box-shadow:inset 0 -3px 0 #a8241e,0 2px 3px rgba(0,0,0,.2)}
+.ly-onion{height:10px;width:84%;border-radius:10px;border:3px solid #c27fcf;background:repeating-linear-gradient(90deg,#f6e6f8 0 30px,#c27fcf 30px 33px)}
+.ly-pickle{height:9px;width:84%;background:repeating-linear-gradient(90deg,#5c9a3a 0 28px,transparent 28px 36px);border-radius:6px}
+.ly-egg{height:17px;width:94%;border-radius:14px;background:radial-gradient(ellipse 22px 9px at 50% 50%,#ffc21a 95%,#fff 100%);box-shadow:inset 0 -3px 0 #e9e1d4}
+.ly-bacon{height:12px;width:98%;border-radius:6px;background:repeating-linear-gradient(90deg,#b8463b 0 12px,#f2a593 12px 18px)}
+.ly-sauce{height:8px;width:90%;border-radius:8px;background:linear-gradient(#ff5a6a,#c8102e);box-shadow:0 2px 2px rgba(0,0,0,.2)}
+.veg .ly-bunb,.veg .ly-bunt{filter:hue-rotate(55deg) saturate(1.3) brightness(1.05)}
+
+/* ============ GAME ============ */
+.game{display:flex;flex-direction:column;gap:12px}
+.timer{display:inline-flex;align-items:center;gap:6px;background:var(--brown);color:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:20px;border:3px solid #fff}
+.timer.low{background:var(--red);animation:pulse .6s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.orders{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;padding-top:26px}
+.cust{background:linear-gradient(#ffe7d6,#f8cdb6);border:4px solid #fff;outline:3px solid #f0c3b3;border-radius:20px;min-height:220px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:8px;cursor:pointer;transition:transform .15s}
+.cust.sel{outline:4px solid var(--green);transform:translateY(-4px);box-shadow:0 0 0 6px rgba(92,191,63,.25)}
+.cust.empty{background:repeating-linear-gradient(45deg,#fbe3d6 0 12px,#f6d6c6 12px 24px);cursor:default;opacity:.7;justify-content:center;font-size:30px}
+.cust .face{width:min(170px,90%);height:130px;animation:arrive .5s}
+.cust .face .chibi{width:100%;height:100%}
+.cust.leaving .face{animation:leave 1.2s forwards}
+@keyframes arrive{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes leave{to{transform:translateX(-60px);opacity:0}}
+.bubble{background:#fff;border:3px solid #e9c9b6;border-radius:16px;padding:8px 10px;font-size:15px;line-height:1.3;width:100%;position:relative;margin-bottom:8px;min-height:60px;font-weight:500}
+.bubble::after{content:"";position:absolute;bottom:-12px;left:50%;margin-left:-10px;border:10px solid transparent;border-top-color:#fff;border-bottom:0}
+.bubble .tr{font-size:12.5px;color:#a2563a;margin-top:4px;font-family:'Mali','Noto Sans SC',sans-serif}
+.bubble .tools{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.bubble .tools button{white-space:nowrap}
+.bubble .tools button{border:2px solid #e2b9a2;background:#fff5ec;border-radius:999px;padding:2px 10px;font-size:14px}
+.hearts{background:#fff;border:3px solid #f0c3b3;border-radius:999px;padding:2px 12px;font-size:18px;margin-top:4px;letter-spacing:2px}
+.hearts .lost{filter:grayscale(1);opacity:.35}
+.cust .num{position:absolute;top:-10px;left:-8px;z-index:3;border:2px solid #fff;background:var(--brown);color:#fff;border-radius:50%;width:24px;height:24px;font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.kitchen{display:grid;grid-template-columns:190px 1fr auto;gap:12px;align-items:stretch}
+.tray{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:linear-gradient(#f6d9a8,#e9bf82);border:4px solid #fff;outline:3px solid #d9a46b;border-radius:20px;padding:10px;align-content:start}
+.ing{border:3px solid #d9a46b;background:#fffaf0;border-radius:14px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;box-shadow:0 3px 0 #c88f50;transition:transform .1s}
+.ing:active{transform:scale(.92)}
+.ing .e{font-size:28px;line-height:1.1}
+.ing b{font-size:14px}
+.ing small{font-size:11px;color:#a2563a;font-family:'Mali','Noto Sans SC',sans-serif;min-height:13px}
+.board-area{background:linear-gradient(#ffeedd,#f6d2b8);border:4px solid #fff;outline:3px solid #f0c3b3;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px;min-height:380px;position:relative}
+.forlabel{font-weight:600;background:#fff;border-radius:999px;padding:4px 14px;border:2px solid #f0c3b3;font-size:15px;text-align:center}
+.plate{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;width:100%;padding-top:10px}
+.dish{width:min(290px,72vw);height:34px;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#fff 55%,#eadfd5 57%,#d8c8ba 100%);margin-top:-12px;box-shadow:0 6px 0 rgba(120,60,30,.15)}
+.plate.drag .dish{box-shadow:0 0 0 6px rgba(92,191,63,.5)}
+.ctrls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+.serve{width:84px;height:84px;border-radius:50%;font-size:44px;border:4px solid #fff;background:radial-gradient(circle at 35% 30%,#8be26b,#3a9a22);box-shadow:0 6px 0 #2f7a1d,0 0 0 3px #2f7a1d;color:#fff}
+.serve:active{transform:translateY(4px);box-shadow:0 2px 0 #2f7a1d,0 0 0 3px #2f7a1d}
+.recipes{background:#3e4a3a;color:#fff;border:6px solid #8a5a33;border-radius:14px;padding:10px 12px;font-size:13.5px;width:210px;font-family:'Fredoka',sans-serif}
+.recipes h4{margin:0 0 6px;text-align:center;color:#ffd84a}
+.recipes div{margin-bottom:6px;line-height:1.35}
+.recipes .e{letter-spacing:1px}
+.combo{font-weight:700;color:var(--red)}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+@media (max-width:820px){
+  .kitchen{grid-template-columns:1fr}
+  .tray{grid-template-columns:repeat(5,1fr);order:2}
+  .board-area{order:1;min-height:300px}
+  .recipes{order:3;width:auto}
+  .orders{gap:6px;padding:8px;padding-top:20px}
+  .cust{min-height:190px;padding:5px}
+  .cust .face{width:92px;height:78px}
+  .bubble{font-size:12.5px;padding:6px}
+  .hearts{font-size:13px;padding:1px 6px}
+  .bubble .tools button{padding:1px 6px;font-size:12px}
+}
+
+/* ============ FEEDBACK / QUIZ / RESULT ============ */
+.grade{font-size:52px;font-weight:700;text-align:center;line-height:1;margin:4px 0;text-shadow:0 4px 0 rgba(0,0,0,.12)}
+.grade.perfect{color:#ffb81f}.grade.good{color:var(--green)}.grade.oops{color:var(--red)}
+.chain{font-size:26px;text-align:center;background:#fff;border-radius:14px;padding:6px;margin:4px 0 10px;word-break:break-word}
+.chain small{display:block;font-size:13px;opacity:.8}
+.sent{background:var(--cream2);border-radius:14px;padding:10px;font-size:17px;margin:8px 0}
+.qbig{font-size:84px;text-align:center;line-height:1.2}
+.qword{font-size:44px;text-align:center;font-weight:700;margin:10px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.opt{border:3px solid var(--brown);background:#fff;border-radius:18px;padding:14px;font-size:24px;font-weight:600;box-shadow:0 4px 0 #b98a66}
+.opt.emo{font-size:52px;padding:6px}
+.opt.right{background:#c8f5b5;border-color:var(--green-d)}
+.opt.wrong{background:#ffc9c9;border-color:var(--red-d)}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:14px 0}
+.stat div{background:#fff;border-radius:16px;padding:10px;text-align:center;border:3px solid #f0c3b3}
+.stat b{display:block;font-size:28px}
+input.txt{font-family:inherit;font-size:18px;padding:10px 14px;border-radius:999px;border:3px solid var(--brown);width:100%;max-width:280px}
+.bigstars{font-size:64px;text-align:center}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:80;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ============ SHOP ============ */
+.shopgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:820px){.shopgrid{grid-template-columns:1fr}}
+.cafe{position:relative;height:340px;border-radius:20px;overflow:hidden;background:linear-gradient(#bfe6ff,#ffe8cf);border:4px solid #fff;outline:3px solid #f0c3b3}
+.cafe .front{position:absolute;left:8%;right:8%;bottom:56px;top:70px;background:linear-gradient(#f3b39a,#e2917a);border:4px solid #b9604a;border-radius:12px 12px 0 0}
+.cafe .sign{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:linear-gradient(#e2474b,#b8333a);color:#fff;border:3px solid #fff3e0;border-radius:12px;padding:4px 16px;font-weight:700;white-space:nowrap}
+.cafe .aw{position:absolute;top:10px;left:-5%;right:-5%;height:34px;background:repeating-linear-gradient(90deg,#e2474b 0 22px,#fff 22px 44px);border-radius:0 0 14px 14px;border:3px solid #b8333a}
+.cafe .win{position:absolute;top:56px;left:8%;right:8%;bottom:0;background:linear-gradient(#ffe9a8,#ffc76a);border:4px solid #8a4a26;border-bottom:0;border-radius:8px 8px 0 0;display:flex;flex-wrap:wrap;align-content:flex-end;justify-content:center;gap:4px;padding:6px;font-size:34px}
+.cafe .floor{position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(rgba(233,196,156,.85),#d9a878);display:flex;justify-content:center;align-items:flex-end;gap:8px;font-size:40px;padding-bottom:4px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button{border:3px solid var(--brown);background:#fff;border-radius:14px;padding:6px 12px;font-weight:600}
+.tabs button.on{background:var(--yellow)}
+.item{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #f0c3b3;border-radius:16px;padding:8px 10px;margin-bottom:8px}
+.item .e{font-size:36px;width:48px;text-align:center}
+.item .info{flex:1}
+.item .info b{font-size:19px}
+.item .info small{display:block;opacity:.75}
+.up{color:var(--green);font-weight:700}
+
+/* ============ DAILY / WORDS / BOARD ============ */
+.goal{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px;margin-bottom:10px;border:3px solid #f0c3b3;font-size:19px;font-weight:600}
+.chk{width:38px;height:38px;border-radius:10px;border:3px solid #b9a090;display:flex;align-items:center;justify-content:center;font-size:26px;background:#fff;flex:none}
+.chk.ok{background:var(--green);border-color:var(--green-d);color:#fff}
+.prog{height:10px;background:#f2e2d6;border-radius:999px;overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#ffc93c,#ff8a3c)}
+.gift{font-size:96px;text-align:center;animation:bob 2s infinite}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.wcard{background:#fff;border:3px solid #f0c3b3;border-radius:16px;padding:10px;text-align:center;cursor:pointer}
+.wcard .e{font-size:38px}
+.wcard b{font-size:19px;display:block}
+.wcard .ipa{font-size:13px;opacity:.7}
+.wcard .tr{font-size:13px;color:#a2563a;font-family:'Mali','Noto Sans SC',sans-serif}
+.wcard.locked{background:#f1e6de;color:#b9a69a;cursor:default}
+.wcard.weak{border-color:#ffb2a8}
+h3.cat{margin:10px 0 8px}
+table.lb{width:100%;border-collapse:collapse;font-size:18px}
+table.lb td,table.lb th{padding:8px;border-bottom:2px dashed #f0c3b3;text-align:left}
+table.lb tr:nth-child(2) td{color:#d18b00;font-weight:700}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="modal"><div class="panel" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   BURGER MASTER ENGLISH!  — single-file English learning game
+   Teachers: edit VOCAB / LEVEL generators below to change content.
+   ========================================================= */
+
+/* ---------- VOCABULARY (id, English, Thai, Chinese, IPA, emoji, category) ---------- */
+const VOCAB_LIST = [
+  // food / ingredients
+  ['bun','bun','ขนมปังเบอร์เกอร์','汉堡面包','/bʌn/','🍞','food'],
+  ['patty','patty','เนื้อบด','肉饼','/ˈpæti/','🥩','food'],
+  ['cheese','cheese','ชีส','奶酪','/tʃiːz/','🧀','food'],
+  ['lettuce','lettuce','ผักกาดหอม','生菜','/ˈletɪs/','🥬','food'],
+  ['tomato','tomato','มะเขือเทศ','番茄','/təˈmeɪtoʊ/','🍅','food'],
+  ['onion','onion','หัวหอม','洋葱','/ˈʌnjən/','🧅','food'],
+  ['pickle','pickle','แตงกวาดอง','酸黄瓜','/ˈpɪkəl/','🥒','food'],
+  ['egg','egg','ไข่','鸡蛋','/eɡ/','🍳','food'],
+  ['bacon','bacon','เบคอน','培根','/ˈbeɪkən/','🥓','food'],
+  ['sauce','sauce','ซอส','酱汁','/sɔːs/','🥫','food'],
+  // numbers
+  ['one','one','หนึ่ง','一','/wʌn/','1️⃣','num'],
+  ['two','two','สอง','二','/tuː/','2️⃣','num'],
+  ['three','three','สาม','三','/θriː/','3️⃣','num'],
+  ['double','double','สองชั้น','双层','/ˈdʌbəl/','✌️','num'],
+  // phrases
+  ['please','please','ได้โปรด / หน่อย','请','/pliːz/','🙏','phrase'],
+  ['thankyou','thank you','ขอบคุณ','谢谢','/θæŋk juː/','💖','phrase'],
+  ['idlike',"I'd like",'ฉันอยากได้','我想要','/aɪd laɪk/','🙋','phrase'],
+  ['without','without','ไม่ใส่','不要','/wɪˈðaʊt/','🚫','phrase'],
+  ['extra','extra','เพิ่มพิเศษ','多加','/ˈekstrə/','➕','phrase'],
+  // colors
+  ['red','red','สีแดง','红色','/red/','🔴','color'],
+  ['green','green','สีเขียว','绿色','/ɡriːn/','🟢','color'],
+  ['yellow','yellow','สีเหลือง','黄色','/ˈjeloʊ/','🟡','color'],
+  ['white','white','สีขาว','白色','/waɪt/','⚪','color'],
+  ['purple','purple','สีม่วง','紫色','/ˈpɜːrpəl/','🟣','color'],
+  // adjectives
+  ['fresh','fresh','สด','新鲜','/freʃ/','🌿','adj'],
+  ['crispy','crispy','กรอบ','酥脆','/ˈkrɪspi/','🥨','adj'],
+  ['hot','hot','ร้อน','热','/hɑːt/','🔥','adj'],
+  ['delicious','delicious','อร่อย','好吃','/dɪˈlɪʃəs/','😋','adj'],
+  // shop items
+  ['table','table','โต๊ะ','桌子','/ˈteɪbəl/','🍽️','shop'],
+  ['chair','chair','เก้าอี้','椅子','/tʃer/','🪑','shop'],
+  ['sofa','sofa','โซฟา','沙发','/ˈsoʊfə/','🛋️','shop'],
+  ['oven','oven','เตาอบ','烤箱','/ˈʌvən/','♨️','shop'],
+  ['fridge','fridge','ตู้เย็น','冰箱','/frɪdʒ/','🧊','shop'],
+  ['grill','grill','เตาย่าง','烤架','/ɡrɪl/','🍖','shop'],
+  ['plant','plant','ต้นไม้','植物','/plænt/','🪴','shop'],
+  ['lamp','lamp','โคมไฟ','灯','/læmp/','💡','shop'],
+  ['flower','flower','ดอกไม้','花','/ˈflaʊər/','🌸','shop'],
+  ['fries','fries','เฟรนช์ฟรายส์','薯条','/fraɪz/','🍟','shop'],
+  ['juice','juice','น้ำผลไม้','果汁','/dʒuːs/','🧃','shop'],
+  ['milkshake','milkshake','มิลค์เชค','奶昔','/ˈmɪlkʃeɪk/','🥤','shop'],
+];
+const V = {};
+VOCAB_LIST.forEach(([id,en,th,zh,ipa,emoji,cat])=>V[id]={id,en,th,zh,ipa,emoji,cat});
+
+/* ingredient properties (color, meat) */
+const ING_PROPS = {
+  patty:{color:'brown',meat:true}, cheese:{color:'yellow'}, lettuce:{color:'green'}, tomato:{color:'red'},
+  onion:{color:'purple'}, pickle:{color:'green'}, egg:{color:'white'}, bacon:{color:'red',meat:true}, sauce:{color:'red'}
+};
+const MID = ['patty','cheese','lettuce','tomato','onion','pickle','egg','bacon','sauce'];
+const TRAY = ['bun',...MID];
+const ING_IMG={bun:'img/i_bun.webp',patty:'img/i_patty.webp',cheese:'img/i_cheese.webp',lettuce:'img/i_lettuce.webp',tomato:'img/i_tomato.webp',onion:'img/i_onion.webp'};
+
+/* ---------- UI TEXT (menus only — target words stay English) ---------- */
+const UI = {
+ en:{play:'Play',how:'How to Play',board:'Leaderboard',shop:'Upgrade Your Shop',daily:'Daily Challenge',words:'Word Book',menu:'Choose Your Menu',back:'Back',locked:'Locked',
+  serve:'Serve',undo:'Undo',clear:'Clear',tapCust:'Tap a customer to take the order!',forCust:'Making the order for customer',listenTap:'Tap 🔊 to listen',
+  perfectSub:'Everything is correct!',goodSub:'Almost! One small mistake.',oopsSub:'Not quite — look at the correct order.',orderWas:'The order was:',youMade:'You made:',next:'Next',
+  quiz:'Mini Quiz',q1:'Which word matches the picture?',q2:'Which picture is…',q3:'Listen and choose!',results:'Day Results',score:'Score',served:'Served',perfects:'Perfect',missed:'Missed',
+  coinsEarned:'Coins earned',yourName:'Your name',save:'Save score',saved:'Saved!',home:'Home',again:'Play again',nextLv:'Next level',buy:'Buy',owned:'Owned',notEnough:'Not enough coins!',
+  claim:'Open gift',claimed:'Gift opened! +200 coins',g1:'Serve 10 burgers!',g2:'Get 3 Perfect Orders!',g3:'Earn 500 coins!',settings:'Settings',ui:'Menu language',mode:'Order mode',
+  listen:'Listen',read:'Read',both:'Both',hint:'Translation hint',off:'Off',music:'Music',sfx:'Sound effects',speed:'Voice speed',slow:'Slow',normal:'Normal',on:'On',close:'Close',
+  recipes:'Menu Board',say:'Say it!',noScores:'No scores yet — go cook!',sayGood:'Great speaking! +20 coins',sayTry:'Nice try! Say it again.',micNo:'Microphone is not available here.',
+  dayOver:'Day over!',full:'The top bun is on — serve it!',needCust:'Choose a customer first',newWord:'New word!',effP:'Customers wait longer',effT:'More tips',effC:'More coins per order',
+  cat_food:'Food',cat_num:'Numbers',cat_phrase:'Phrases',cat_color:'Colors',cat_adj:'Adjectives',cat_shop:'Shop items',rank:'#',name:'Name',level:'Level',unlock:'Get 1 star on the previous level',
+  combo:'Combo',furniture:'Furniture',kitchen:'Kitchen',decoration:'Decoration',menuCat:'Menu',learned:'words learned',start:'Start',empty:'Empty',
+  learn_classic:'Ingredient names',learn_cheese:'Numbers & quantities',learn_double:'Ordering sentences',learn_veggie:'Colors & adjectives',
+  howSteps:['Choose a burger level from the menu.','Tap a customer to hear the order in English.','Tap ingredients to build. Start with the bottom bun 🍞 and finish with the top bun 🍞.','Press ✔ to serve. Perfect orders give more coins and combos!','After each day, play a mini quiz for bonus coins.','Spend coins to upgrade your shop and learn new words.','Need help? Turn on Thai/Chinese hints in ⚙ Settings.']},
+ th:{play:'เล่น',how:'วิธีเล่น',board:'กระดานคะแนน',shop:'อัปเกรดร้าน',daily:'ภารกิจประจำวัน',words:'สมุดคำศัพท์',menu:'เลือกเมนู',back:'กลับ',locked:'ล็อกอยู่',
+  serve:'เสิร์ฟ',undo:'ย้อน',clear:'ล้าง',tapCust:'แตะที่ลูกค้าเพื่อรับออเดอร์!',forCust:'กำลังทำให้ลูกค้าคนที่',listenTap:'แตะ 🔊 เพื่อฟัง',
+  perfectSub:'ถูกต้องทุกอย่าง!',goodSub:'เกือบแล้ว! ผิดไป 1 อย่าง',oopsSub:'ยังไม่ถูก ดูออเดอร์ที่ถูกต้องด้านล่าง',orderWas:'ออเดอร์ที่ถูกต้อง:',youMade:'ที่คุณทำ:',next:'ต่อไป',
+  quiz:'มินิควิซ',q1:'คำไหนตรงกับภาพ?',q2:'ภาพไหนคือ…',q3:'ฟังแล้วเลือกให้ถูก!',results:'สรุปผลประจำวัน',score:'คะแนน',served:'เสิร์ฟแล้ว',perfects:'Perfect',missed:'ลูกค้ากลับ',
+  coinsEarned:'เหรียญที่ได้',yourName:'ชื่อของคุณ',save:'บันทึกคะแนน',saved:'บันทึกแล้ว!',home:'หน้าแรก',again:'เล่นอีกครั้ง',nextLv:'ด่านถัดไป',buy:'ซื้อ',owned:'มีแล้ว',notEnough:'เหรียญไม่พอ!',
+  claim:'เปิดของขวัญ',claimed:'เปิดของขวัญแล้ว! +200 เหรียญ',g1:'เสิร์ฟเบอร์เกอร์ 10 ชิ้น',g2:'ได้ Perfect 3 ครั้ง',g3:'สะสม 500 เหรียญ',settings:'ตั้งค่า',ui:'ภาษาเมนู',mode:'โหมดออเดอร์',
+  listen:'ฟัง',read:'อ่าน',both:'ทั้งคู่',hint:'คำใบ้แปล',off:'ปิด',music:'เพลง',sfx:'เสียงเอฟเฟกต์',speed:'ความเร็วเสียงพูด',slow:'ช้า',normal:'ปกติ',on:'เปิด',close:'ปิด',
+  recipes:'กระดานเมนู',say:'พูดตาม!',noScores:'ยังไม่มีคะแนน ไปทำเบอร์เกอร์กัน!',sayGood:'พูดเก่งมาก! +20 เหรียญ',sayTry:'ดีมาก! ลองพูดอีกครั้งนะ',micNo:'ใช้ไมโครโฟนที่นี่ไม่ได้',
+  dayOver:'หมดวันแล้ว!',full:'ปิดขนมปังแล้ว กดเสิร์ฟเลย!',needCust:'เลือกลูกค้าก่อนนะ',newWord:'คำศัพท์ใหม่!',effP:'ลูกค้ารอได้นานขึ้น',effT:'ได้ทิปมากขึ้น',effC:'ได้เหรียญต่อออเดอร์มากขึ้น',
+  cat_food:'อาหาร',cat_num:'ตัวเลข',cat_phrase:'วลี',cat_color:'สี',cat_adj:'คำคุณศัพท์',cat_shop:'ของในร้าน',rank:'#',name:'ชื่อ',level:'ด่าน',unlock:'ได้ 1 ดาวในด่านก่อนหน้าเพื่อปลดล็อก',
+  combo:'คอมโบ',furniture:'เฟอร์นิเจอร์',kitchen:'ครัว',decoration:'ของตกแต่ง',menuCat:'เมนู',learned:'คำที่เรียนแล้ว',start:'เริ่ม',empty:'ว่าง',
+  learn_classic:'ชื่อวัตถุดิบ',learn_cheese:'ตัวเลขและปริมาณ',learn_double:'ประโยคสั่งอาหาร',learn_veggie:'สีและคำคุณศัพท์',
+  howSteps:['เลือกด่านเบอร์เกอร์จากเมนู','แตะที่ลูกค้าเพื่อฟังออเดอร์ภาษาอังกฤษ','แตะวัตถุดิบเพื่อประกอบ เริ่มด้วยขนมปังล่าง 🍞 และปิดด้วยขนมปังบน 🍞','กด ✔ เพื่อเสิร์ฟ ได้ Perfect จะได้เหรียญและคอมโบมากขึ้น!','จบแต่ละวันจะมีมินิควิซให้เหรียญโบนัส','ใช้เหรียญอัปเกรดร้านและเรียนคำศัพท์ใหม่','ต้องการตัวช่วย? เปิดคำใบ้ภาษาไทย/จีนได้ที่ ⚙ ตั้งค่า']},
+ zh:{play:'开始',how:'玩法说明',board:'排行榜',shop:'升级店铺',daily:'每日挑战',words:'单词本',menu:'选择菜单',back:'返回',locked:'未解锁',
+  serve:'上菜',undo:'撤销',clear:'清空',tapCust:'点击顾客来接订单！',forCust:'正在为顾客制作：',listenTap:'点击 🔊 收听',
+  perfectSub:'全部正确！',goodSub:'差一点！错了一个。',oopsSub:'不太对——看看正确的订单。',orderWas:'正确订单：',youMade:'你做的：',next:'下一步',
+  quiz:'小测验',q1:'哪个单词和图片相符？',q2:'哪张图片是…',q3:'听一听，选一选！',results:'今日结果',score:'分数',served:'已上菜',perfects:'完美',missed:'离开',
+  coinsEarned:'获得金币',yourName:'你的名字',save:'保存分数',saved:'已保存！',home:'首页',again:'再玩一次',nextLv:'下一关',buy:'购买',owned:'已拥有',notEnough:'金币不够！',
+  claim:'打开礼物',claimed:'礼物已打开！+200 金币',g1:'完成10个汉堡！',g2:'获得3次完美订单！',g3:'赚到500金币！',settings:'设置',ui:'菜单语言',mode:'订单模式',
+  listen:'听',read:'读',both:'听+读',hint:'翻译提示',off:'关闭',music:'音乐',sfx:'音效',speed:'语速',slow:'慢',normal:'正常',on:'开',close:'关闭',
+  recipes:'菜单板',say:'跟着说！',noScores:'还没有分数——快去做汉堡吧！',sayGood:'说得真棒！+20 金币',sayTry:'不错！再说一次。',micNo:'这里无法使用麦克风。',
+  dayOver:'今天结束啦！',full:'顶层面包已放好——快上菜！',needCust:'请先选择顾客',newWord:'新单词！',effP:'顾客等待更久',effT:'小费更多',effC:'每单金币更多',
+  cat_food:'食物',cat_num:'数字',cat_phrase:'短语',cat_color:'颜色',cat_adj:'形容词',cat_shop:'店铺物品',rank:'#',name:'名字',level:'关卡',unlock:'上一关获得1颗星即可解锁',
+  combo:'连击',furniture:'家具',kitchen:'厨房',decoration:'装饰',menuCat:'菜单',learned:'已学单词',start:'开始',empty:'空',
+  learn_classic:'食材名称',learn_cheese:'数字与数量',learn_double:'点餐句型',learn_veggie:'颜色与形容词',
+  howSteps:['从菜单中选择一个汉堡关卡。','点击顾客，听英语订单。','点击食材来制作：先放底层面包 🍞，最后放顶层面包 🍞。','按 ✔ 上菜。完美订单可获得更多金币和连击！','每天结束后有小测验，可得额外金币。','用金币升级店铺，学习新单词。','需要帮助？在 ⚙ 设置中打开泰语/中文提示。']}
+};
+
+/* ---------- SAVE / LOAD ---------- */
+function defLang(){ const l=(navigator.language||'en').toLowerCase(); return l.startsWith('th')?'th':l.startsWith('zh')?'zh':'en'; }
+const DEF = ()=>({coins:100,stars:[0,0,0,0],unlocked:1,owned:{},seen:{},wrong:{},board:[],name:'',
+  set:{ui:defLang(),mode:'both',hint:defLang()==='en'?'off':defLang(),music:true,sfx:true,slow:false,mute:false},
+  daily:{date:'',served:0,perfect:0,coins:0,claimed:false}});
+let S;
+function load(){ try{ const raw=localStorage.getItem('bme_save'); S=raw?Object.assign(DEF(),JSON.parse(raw)):DEF(); S.set=Object.assign(DEF().set,S.set||{}); }catch(e){ S=DEF(); } checkDaily(); }
+function save(){ try{ localStorage.setItem('bme_save',JSON.stringify(S)); }catch(e){} }
+function today(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function checkDaily(){ if(S.daily.date!==today()) S.daily={date:today(),served:0,perfect:0,coins:0,claimed:false}; }
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const t=k=>{const d=UI[S.set.ui]||UI.en;return d[k]!==undefined?d[k]:(UI.en[k]!==undefined?UI.en[k]:k);};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hintOn=()=>S.set.hint!=='off';
+const trw=id=>hintOn()&&V[id]?V[id][S.set.hint]:'';
+function weight(id){ return 1+(S.wrong[id]||0)*1.5; }
+function wpick(arr){ const ws=arr.map(weight); let r=Math.random()*ws.reduce((a,b)=>a+b,0); for(let i=0;i<arr.length;i++){ r-=ws[i]; if(r<=0) return arr[i]; } return arr[arr.length-1]; }
+function pickDistinct(pool,n){ const out=[]; let p=[...pool]; while(out.length<n&&p.length){ const x=wpick(p); out.push(x); p=p.filter(y=>y!==x); } return out; }
+function joinL(list,lang){ if(list.length===1) return list[0]; const sep=lang==='zh'?'、':', ', and=lang==='en'?' and ':lang==='th'?' และ ':'和'; return list.slice(0,-1).join(sep)+and+list[list.length-1]; }
+let toastT; function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2000); }
+function starsHTML(n){ return `<span class="stars">${[1,2,3].map(i=>i<=n?'★':'<span class="off">★</span>').join('')}</span>`; }
+
+/* ---------- SPEECH ---------- */
+let voice=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices().filter(v=>/^en[-_]US/i.test(v.lang)); voice=vs.find(v=>/female|samantha|google us/i.test(v.name))||vs[0]||null; }catch(e){} }
+try{ speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }catch(e){}
+function say(text){ if(S.set.mute) return; try{ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=S.set.slow?0.72:0.95; u.pitch=1.15; if(voice) u.voice=voice; speechSynthesis.speak(u); }catch(e){} }
+
+/* ---------- SOUND (Web Audio) ---------- */
+let AC=null;
+function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(AC.state==='suspended') AC.resume().catch(()=>{}); return AC; }
+function tone(f,d=.15,type='sine',v=.12,delay=0){ const a=ac(); if(!a) return; const t0=a.currentTime+delay; const o=a.createOscillator(), g=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,t0); g.gain.setValueAtTime(v,t0); g.gain.exponentialRampToValueAtTime(.0001,t0+d); o.connect(g).connect(a.destination); o.start(t0); o.stop(t0+d+.03); }
+const sfxOn=()=>S.set.sfx&&!S.set.mute;
+const sfx={
+  pop(){ if(!sfxOn())return; tone(520,.08,'square',.05); tone(820,.09,'square',.04,.05); },
+  click(){ if(!sfxOn())return; tone(880,.05,'sine',.06); },
+  ding(){ if(!sfxOn())return; tone(1046,.25,'sine',.12); tone(1318,.4,'sine',.1,.12); },
+  cash(){ if(!sfxOn())return; [1318,1568,2093,2637].forEach((f,i)=>tone(f,.16,'triangle',.08,i*.07)); },
+  buzz(){ if(!sfxOn())return; tone(180,.3,'sawtooth',.06); tone(140,.3,'sawtooth',.05,.12); },
+  fanfare(){ if(!sfxOn())return; [523,659,784,1046,784,1046].forEach((f,i)=>tone(f,.22,'triangle',.09,i*.12)); }
+};
+let musicT=null;
+const MEL=[523,659,784,659,587,698,880,698,523,659,784,1046,988,784,659,587];
+function startMusic(){ if(musicT||!S.set.music||S.set.mute) return; let i=0; musicT=setInterval(()=>{ tone(MEL[i%MEL.length],.24,'triangle',.025); if(i%4===0) tone(MEL[i%MEL.length]/4,.5,'sine',.035); i++; },300); }
+function stopMusic(){ clearInterval(musicT); musicT=null; }
+document.addEventListener('pointerdown',()=>{ ac(); startMusic(); },{once:false});
+
+/* ---------- CHIBI CHARACTER (SVG) ---------- */
+function chibi(o={}){
+  const h=o.hair||'#4a2c1d', sk=o.skin||'#ffe0c8', sh=o.shirt||'#3b5b8c', m=o.mood||'happy';
+  const eyeOpen=(cx)=>`<ellipse cx="${cx}" cy="64" rx="6.5" ry="8.5" fill="#3a2418"/><circle cx="${cx+2.5}" cy="60.5" r="2.6" fill="#fff"/><circle cx="${cx-2}" cy="67.5" r="1.2" fill="#fff"/>`;
+  const eyeJoy=(cx)=>`<path d="M${cx-7} 66 Q${cx} 57 ${cx+7} 66" stroke="#3a2418" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
+  let s=`<svg class="chibi" viewBox="0 0 120 132" xmlns="http://www.w3.org/2000/svg">`;
+  if(o.long) s+=`<path d="M20 50 Q6 100 26 118 L44 74Z M100 50 Q114 100 94 118 L76 74Z" fill="${h}"/>`;
+  if(o.pony) s+=`<path d="M92 36 Q126 36 118 82 Q112 104 98 108 Q108 80 90 56Z" fill="${h}"/><circle cx="96" cy="40" r="7" fill="#d9454c"/>`;
+  if(o.chef) s+=`<path d="M26 132 Q26 98 60 96 Q94 98 94 132Z" fill="#fff"/><path d="M42 102 h36 v30 h-36z" fill="#b8333a"/><circle cx="60" cy="118" r="7" fill="#ffc93c"/><rect x="53" y="117" width="14" height="4" rx="2" fill="#7a4223"/>`;
+  else s+=`<path d="M26 132 Q26 98 60 96 Q94 98 94 132Z" fill="${sh}"/><path d="M50 98 L60 110 L70 98" fill="#fff" opacity=".8"/>`;
+  s+=`<ellipse cx="60" cy="54" rx="45" ry="43" fill="${h}"/><ellipse cx="60" cy="61" rx="36" ry="34" fill="${sk}"/>`;
+  s+=`<path d="M21 58 Q22 16 60 16 Q98 16 99 58 Q90 40 78 43 Q72 30 61 39 Q49 28 42 45 Q30 40 21 58Z" fill="${h}"/>`;
+  if(m==='joy') s+=eyeJoy(45)+eyeJoy(75);
+  else if(m==='wink') s+=eyeOpen(45)+eyeJoy(75);
+  else if(m==='angry') s+=`<path d="M36 53 L52 58 M84 53 L68 58" stroke="#3a2418" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="45" cy="65" rx="4.5" ry="5.5" fill="#3a2418"/><ellipse cx="75" cy="65" rx="4.5" ry="5.5" fill="#3a2418"/>`;
+  else if(m==='sad') s+=eyeOpen(45)+eyeOpen(75)+`<path d="M38 52 L52 49 M82 52 L68 49" stroke="#3a2418" stroke-width="2.6" stroke-linecap="round"/><path d="M84 70 q4 7 0 10 q-4 -3 0 -10" fill="#7ec8f2"/>`;
+  else s+=eyeOpen(45)+eyeOpen(75);
+  s+=`<ellipse cx="35" cy="76" rx="6.5" ry="3.6" fill="#ff8f9c" opacity=".55"/><ellipse cx="85" cy="76" rx="6.5" ry="3.6" fill="#ff8f9c" opacity=".55"/>`;
+  s+=(m==='angry'||m==='sad')?`<path d="M53 84 Q60 77 67 84" stroke="#5a2d16" stroke-width="2.8" fill="none" stroke-linecap="round"/>`:`<path d="M52 77 Q60 89 68 77 Z" fill="#d94a4a"/><path d="M55 80 Q60 85 65 80" fill="#ff9aa2"/>`;
+  const a=o.acc||'';
+  if(a==='chef') s+=`<path d="M17 47 Q17 6 60 6 Q103 6 103 47 Q60 34 17 47Z" fill="#fff" stroke="#e8d6c6" stroke-width="2"/><path d="M12 47 Q60 30 108 47 Q60 58 12 47Z" fill="#d9454c"/><circle cx="60" cy="24" r="8" fill="#ffc93c"/><rect x="53" y="23" width="14" height="4" rx="2" fill="#7a4223"/>`;
+  if(a==='beanie') s+=`<path d="M19 46 Q19 4 60 4 Q101 4 101 46Z" fill="#9aa3ad"/><rect x="15" y="38" width="90" height="13" rx="6" fill="#7d8590"/>`;
+  if(a==='sunglasses') s+=`<rect x="33" y="17" width="21" height="11" rx="5" fill="#222"/><rect x="66" y="17" width="21" height="11" rx="5" fill="#222"/><rect x="54" y="20" width="12" height="3" fill="#222"/><rect x="37" y="19" width="6" height="3" rx="1" fill="#88c9ff"/>`;
+  if(a==='headphones') s+=`<path d="M15 64 Q13 10 60 10 Q107 10 105 64" stroke="#3b3b3b" stroke-width="7" fill="none"/><rect x="6" y="52" width="17" height="27" rx="7" fill="#555"/><rect x="97" y="52" width="17" height="27" rx="7" fill="#555"/>`;
+  if(a==='bow') s+=`<path d="M86 22 l15 -11 v22z M86 22 l-15 -11 v22z" fill="#e2474b"/><circle cx="86" cy="22" r="4.5" fill="#b8333a"/>`;
+  if(a==='glasses') s+=`<circle cx="45" cy="64" r="11.5" stroke="#333" stroke-width="2.6" fill="rgba(255,255,255,.15)"/><circle cx="75" cy="64" r="11.5" stroke="#333" stroke-width="2.6" fill="rgba(255,255,255,.15)"/><path d="M56.5 64 h7" stroke="#333" stroke-width="2.6"/>`;
+  return s+'</svg>';
+}
+const CUSTS=['img/cust1.webp','img/cust2.webp','img/cust3.webp'];
+const LOOKS=[
+  {hair:'#2b1d14',acc:'sunglasses',shirt:'#2f4a7a'},{hair:'#7a4a2a',acc:'beanie',shirt:'#8a9a5b',long:true},
+  {hair:'#f2c94c',acc:'headphones',shirt:'#34495e'},{hair:'#c0392b',acc:'bow',shirt:'#e67e22',long:true},
+  {hair:'#5d4037',acc:'',shirt:'#16a085'},{hair:'#1a1a2e',acc:'glasses',shirt:'#8e44ad'},
+  {hair:'#e8a0bf',acc:'bow',shirt:'#ff7aa2',long:true},{hair:'#3e2723',acc:'',shirt:'#d35400',skin:'#e8b08a'},
+  {hair:'#212121',acc:'headphones',shirt:'#27ae60',skin:'#f6cba5'}
+];
+
+/* ---------- BURGER RENDER ---------- */
+function layersHTML(stack,newLast){ return stack.map((l,i)=>`<div class="ly ly-${l}${newLast&&i===stack.length-1?' new':''}"></div>`).join(''); }
+function miniBurger(layers,veg){ return `<div class="stack mini${veg?' veg':''}">${layersHTML(layers)}</div>`; }
+const emo=id=>id==='bunb'||id==='bunt'?'🍞':(V[id]?V[id].emoji:'❔');
+function chainHTML(list){ return list.map(emo).join(' '); }
+
+/* =========================================================
+   ORDER GENERATORS — each returns {en, th, zh, target|colors, words, answer}
+   ========================================================= */
+function genClassic(){
+  const items=pickDistinct(MID,rnd([2,3,3]));
+  const L={en:joinL(items.map(i=>V[i].en),'en'),th:joinL(items.map(i=>V[i].th),'th'),zh:joinL(items.map(i=>V[i].zh),'zh')};
+  const en=rnd([`Can I have a burger with ${L.en}, please?`,`Hi! A burger with ${L.en}, please.`,`I'd like ${L.en} in my burger, please!`]);
+  return {en,th:`ขอเบอร์เกอร์ใส่${L.th}หน่อยนะ`,zh:`请给我一个加${L.zh}的汉堡。`,target:items,answer:items,words:[...items,'bun','please']};
+}
+const UNIT={cheese:['slice of cheese','slices of cheese','แผ่น','片'],tomato:['slice of tomato','slices of tomato','แว่น','片'],lettuce:['leaf of lettuce','leaves of lettuce','ใบ','片'],
+  onion:['onion ring','onion rings','วง','个'],pickle:['pickle','pickles','ชิ้น','片'],egg:['egg','eggs','ฟอง','个'],bacon:['strip of bacon','strips of bacon','ชิ้น','条'],
+  patty:['patty','patties','ชิ้น','块'],sauce:['spoon of sauce','spoons of sauce','ช้อน','勺']};
+const NUMEN=['zero','one','two','three'], NUMZH=['','一','两','三'];
+function genNumbers(){
+  const items=pickDistinct(MID,2); let a=1+Math.floor(Math.random()*3), b=1+Math.floor(Math.random()*2); if(a+b>5) a=2;
+  const ns=[a,b]; const target=[]; items.forEach((it,i)=>{ for(let k=0;k<ns[i];k++) target.push(it); });
+  const pe=items.map((it,i)=>`${NUMEN[ns[i]]} ${ns[i]>1?UNIT[it][1]:UNIT[it][0]}`);
+  const pt=items.map((it,i)=>`${V[it].th} ${ns[i]} ${UNIT[it][2]}`);
+  const pz=items.map((it,i)=>`${NUMZH[ns[i]]}${UNIT[it][3]}${V[it].zh}`);
+  const en=rnd([`I'd like a burger with ${pe[0]} and ${pe[1]}, please.`,`Can I have ${pe[0]} and ${pe[1]} on my burger?`]);
+  return {en,th:`ขอเบอร์เกอร์ใส่${pt[0]} กับ${pt[1]}นะ`,zh:`我要一个汉堡，加${pz[0]}和${pz[1]}。`,target,answer:target,words:[...items,NUMEN[a],NUMEN[b],'idlike','please']};
+}
+const RECIPES={
+  classic:{en:'classic burger',th:'คลาสสิกเบอร์เกอร์',zh:'经典汉堡',items:['patty','lettuce','tomato']},
+  cheeseb:{en:'cheese burger',th:'ชีสเบอร์เกอร์',zh:'芝士汉堡',items:['patty','cheese','lettuce']},
+  double:{en:'double burger',th:'ดับเบิลเบอร์เกอร์',zh:'双层汉堡',items:['patty','cheese','patty','cheese']},
+  breakfast:{en:'breakfast burger',th:'เบอร์เกอร์อาหารเช้า',zh:'早餐汉堡',items:['patty','egg','bacon']}
+};
+function genDouble(){
+  const key=rnd(Object.keys(RECIPES)), r=RECIPES[key];
+  const removable=[...new Set(r.items.filter(x=>x!=='patty'))];
+  const mod=rnd(['without','extra','both']);
+  const x=rnd(removable), y=wpick(MID.filter(i=>i!==x));
+  let target=[...r.items], en, th, zh, words=[...new Set(r.items)];
+  if(mod!=='extra'){ target=target.filter(i=>i!==x); words.push('without'); }
+  if(mod!=='without'){ target.push(y); words.push('extra',y); }
+  if(key==='double') words.push('double');
+  if(mod==='without'){ en=`I'd like a ${r.en} without ${V[x].en}, please.`; th=`ขอ${r.th} ไม่ใส่${V[x].th}นะ`; zh=`我要一个${r.zh}，不要${V[x].zh}。`; }
+  else if(mod==='extra'){ en=`Can I have a ${r.en} with extra ${V[y].en}?`; th=`ขอ${r.th} เพิ่ม${V[y].th}ได้ไหม`; zh=`可以给我一个${r.zh}，多加${V[y].zh}吗？`; }
+  else { en=`A ${r.en} with extra ${V[y].en} and no ${V[x].en}, please!`; th=`ขอ${r.th} เพิ่ม${V[y].th} ไม่ใส่${V[x].th}นะ`; zh=`一个${r.zh}，多加${V[y].zh}，不要${V[x].zh}！`; }
+  words.push('idlike');
+  return {en,th,zh,target,answer:target,words};
+}
+const COLOR_ITEMS={red:['tomato','sauce'],green:['lettuce','pickle'],yellow:['cheese'],white:['egg'],purple:['onion']};
+function genVeggie(){
+  const [c1,c2]=pickDistinct(Object.keys(COLOR_ITEMS),2); const n1=rnd([1,2]), n2=1; const adj=wpick(['fresh','crispy','hot','delicious']);
+  const th1=V[c1].th.replace('สี',''), th2=V[c2].th.replace('สี','');
+  const en=`A ${adj} veggie burger with ${NUMEN[n1]} ${c1} thing${n1>1?'s':''} and ${NUMEN[n2]} ${c2} thing, please. No meat!`;
+  const th=`ขอเบอร์เกอร์ผัก${V[adj].th}ๆ ใส่ของสี${th1} ${n1} อย่าง และสี${th2} ${n2} อย่าง ไม่เอาเนื้อนะ`;
+  const zh=`请给我一个${V[adj].zh}的素食汉堡，要${NUMZH[n1]}个${V[c1].zh}的和${NUMZH[n2]}个${V[c2].zh}的，不要肉！`;
+  const answer=[]; for(let i=0;i<n1;i++) answer.push(rnd(COLOR_ITEMS[c1])); answer.push(rnd(COLOR_ITEMS[c2]));
+  return {en,th,zh,colors:{[c1]:n1,[c2]:n2},answer,words:[c1,c2,adj,NUMEN[n1],'please']};
+}
+const LEVELS=[
+  {key:'classic',name:'Classic Burger',gen:genClassic,patience:17,icon:['bunb','patty','tomato','lettuce','bunt'],pool:['food']},
+  {key:'cheese',name:'Cheese Burger',gen:genNumbers,patience:19,icon:['bunb','patty','cheese','cheese','bunt'],pool:['food','num']},
+  {key:'double',name:'Double Burger',gen:genDouble,patience:21,icon:['bunb','patty','cheese','patty','cheese','lettuce','bunt'],pool:['food','phrase']},
+  {key:'veggie',name:'Veggie Burger',gen:genVeggie,patience:21,icon:['bunb','lettuce','tomato','pickle','lettuce','bunt'],veg:true,pool:['color','adj','food']}
+];
+const LEVEL_EX={classic:'"Can I have a burger with cheese and tomato?"',cheese:'"Two slices of cheese and one egg."',double:'"A double burger without cheese, please."',veggie:'"One red thing and two green things!"'};
+
+/* ---------- CHECK A BURGER ---------- */
+function checkOrder(o,stack){
+  let m=0; const bad=[];
+  if(stack[0]!=='bunb') m++;
+  if(stack.length<2||stack[stack.length-1]!=='bunt') m++;
+  const mid=stack.filter(x=>x!=='bunb'&&x!=='bunt');
+  if(o.colors){
+    const meat=mid.filter(x=>ING_PROPS[x].meat); m+=meat.length; bad.push(...meat);
+    for(const c in o.colors){ const d=Math.abs(mid.filter(x=>!ING_PROPS[x].meat&&ING_PROPS[x].color===c).length-o.colors[c]); if(d){ m+=d; bad.push(c); } }
+    const other=mid.filter(x=>!ING_PROPS[x].meat&&!(ING_PROPS[x].color in o.colors)); m+=other.length; bad.push(...other.map(x=>ING_PROPS[x].color));
+  } else {
+    const cnt={}; o.target.forEach(x=>cnt[x]=(cnt[x]||0)+1); mid.forEach(x=>cnt[x]=(cnt[x]||0)-1);
+    for(const k in cnt) if(cnt[k]){ m+=Math.abs(cnt[k]); bad.push(k); }
+  }
+  return {m,bad:[...new Set(bad)]};
+}
+
+/* ---------- SHOP ---------- */
+const SHOP=[
+  ['table','furniture',80],['chair','furniture',120],['sofa','furniture',250],
+  ['oven','kitchen',150],['fridge','kitchen',200],['grill','kitchen',300],
+  ['plant','decoration',60],['lamp','decoration',100],['flower','decoration',180],
+  ['fries','menuCat',120],['juice','menuCat',150],['milkshake','menuCat',250]
+];
+const EFFECT={furniture:'effP',kitchen:'effP',decoration:'effT',menuCat:'effC'};
+function ownedIn(cat){ return SHOP.filter(s=>s[1]===cat&&S.owned[s[0]]).length; }
+const bonusPatience=()=>ownedIn('furniture')*1+ownedIn('kitchen')*1.5;
+const tipPct=()=>ownedIn('decoration')*5;
+const menuCoins=()=>ownedIn('menuCat')*3;
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+let G=null, CUR='home';
+function go(name,arg){
+  if(G&&G.iv&&name!=='game'){ clearInterval(G.iv); G.iv=null; }
+  try{ speechSynthesis.cancel(); }catch(e){}
+  CUR=name; closeModal(); sfx.click();
+  const R=$('#root');
+  if(name==='home') R.innerHTML=renderHome();
+  else if(name==='menu') R.innerHTML=renderMenu();
+  else if(name==='game') startLevel(arg);
+  else if(name==='shop') R.innerHTML=renderShop(arg||'furniture');
+  else if(name==='daily') R.innerHTML=renderDaily();
+  else if(name==='words') R.innerHTML=renderWords();
+  else if(name==='board') R.innerHTML=renderBoard();
+  window.scrollTo(0,0);
+}
+function header(title,extra=''){
+  return `<div class="topbar"><button class="btn" onclick="go('home')">⬅ ${t('back')}</button><div class="spacer"></div>${extra}<span class="coinpill">🪙 <span class="coinv">${S.coins}</span></span>
+  <button class="ibtn" onclick="openSettings()" aria-label="settings">⚙️</button></div><div class="title-row"><span class="ribbon">${title}</span></div>`;
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const learned=Object.keys(S.seen).length;
+  const giftReady=dailyDone()&&!S.daily.claimed;
+  return `<div class="hero" role="img" aria-label="Burger Master title art">
+     <span class="eng">English</span>
+     <button class="hs" style="left:58.6%;top:54.8%;width:21.2%;height:12.6%" onclick="go('menu')" aria-label="${t('play')}"></button>
+     <button class="hs" style="left:59.5%;top:70.7%;width:19.5%;height:8.6%" onclick="openHow()" aria-label="${t('how')}"></button>
+     <button class="hs" style="left:59.5%;top:82.8%;width:19.5%;height:8.6%" onclick="go('board')" aria-label="${t('board')}"></button>
+     <button class="hs round" style="left:86.5%;top:1.8%;width:5.5%;height:9.2%" onclick="openSettings()" aria-label="settings"></button>
+     <button class="hs round" style="left:92.5%;top:1.8%;width:5.5%;height:9.2%" onclick="toggleMute()" aria-label="sound"></button>
+     ${S.set.mute?'<span class="mutex">🚫</span>':''}
+   </div>
+   <div class="home-row">
+     <span class="coinpill">🪙 ${S.coins}</span>
+     <button class="btn yellow" onclick="go('menu')">▶ ${t('play')}</button>
+     <button class="btn" onclick="go('shop')">🏪 ${t('shop')}</button>
+     <button class="btn" style="position:relative" onclick="go('daily')">🎁 ${t('daily')}${giftReady?'<span class="badge">!</span>':''}</button>
+     <button class="btn" onclick="go('words')">📚 ${t('words')} <small>(${learned})</small></button>
+   </div>`;
+}
+function toggleMute(){ S.set.mute=!S.set.mute; save(); if(S.set.mute){ stopMusic(); try{speechSynthesis.cancel();}catch(e){} } else startMusic(); if(CUR==='home') $('#root').innerHTML=renderHome(); }
+
+/* ---------- MENU / LEVEL SELECT ---------- */
+function renderMenu(){
+  return header(t('menu'))+`<div class="panel"><div class="levels">${LEVELS.map((L,i)=>{
+    const locked=i>=S.unlocked;
+    return `<div class="lvl${locked?' locked':''}">
+      <div class="mini-wrap"><img class="lvlimg" src="img/b_${L.key}.webp" alt="${L.name}"></div>
+      <h3>${L.name}</h3>${starsHTML(S.stars[i])}
+      <div class="learn">📘 ${t('learn_'+L.key)}</div>
+      <div class="ex">${LEVEL_EX[L.key]}</div>
+      ${locked?`<button class="btn" disabled>🔒 ${t('locked')}</button><div style="font-size:12px;margin-top:6px">${t('unlock')}</div>`
+              :`<button class="btn yellow" onclick="go('game',${i})">▶ ${t('start')}</button>`}
+    </div>`;}).join('')}</div></div>`;
+}
+
+/* =========================================================
+   GAMEPLAY
+   ========================================================= */
+const DAY_TIME=150, DAY_CUSTOMERS=8;
+function perHeart(){ return G.L.patience+bonusPatience(); }
+function startLevel(li){
+  G={li,L:LEVELS[li],time:DAY_TIME,slots:[null,null,null],spawnAt:[0.3,3.5,7],spawned:0,sel:-1,stack:[],
+     served:0,perfect:0,good:0,missed:0,coins:0,score:0,combo:0,paused:false,over:false,last:performance.now(),lookI:Math.floor(Math.random()*LOOKS.length)};
+  $('#root').innerHTML=renderGame();
+  renderAllCust(); renderStack(); renderTimer();
+  G.iv=setInterval(tick,200);
+}
+function renderGame(){
+  const L=G.L;
+  return `<div class="game">
+   <div class="topbar">
+     <button class="btn" onclick="go('menu')">⬅ ${t('back')}</button>
+     <span class="ribbon small">${L.name}</span><div class="spacer"></div>
+     <span class="combo" id="combo"></span>
+     <span class="coinpill">🪙 <span class="coinv">${S.coins}</span></span>
+     <span class="timer" id="timer">⏱ 02:30</span>
+     <button class="ibtn" onclick="openSettings()" aria-label="settings">⚙️</button>
+   </div>
+   <div class="panel" style="padding:0"><div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%)"><span class="ribbon small">Orders</span></div>
+     <div class="orders" id="orders">${[0,1,2].map(i=>`<div class="cust empty" id="c${i}"></div>`).join('')}</div></div>
+   <div class="kitchen">
+     <div class="tray">${TRAY.map(id=>`<button class="ing" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${id}')" onclick="addIng('${id}')">${ING_IMG[id]?`<img class="ingimg" src="${ING_IMG[id]}" alt="" draggable="false">`:`<span class="e">${V[id].emoji}</span>`}<b>${V[id].en}</b><small>${esc(trw(id))}</small></button>`).join('')}</div>
+     <div class="board-area">
+       <div class="forlabel" id="forlabel"></div>
+       <div class="plate" id="plate" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');addIng(event.dataTransfer.getData('text/plain'))">
+         <div class="stack" id="stack"></div><div class="dish"></div></div>
+       <div class="ctrls">
+         <button class="btn" onclick="undoIng()">↩ ${t('undo')}</button>
+         <button class="serve" onclick="serve()" aria-label="serve">✔</button>
+         <button class="btn" onclick="clearIng()">🗑 ${t('clear')}</button>
+       </div>
+     </div>
+     ${L.key==='double'?`<div class="recipes"><h4>📋 ${t('recipes')}</h4>${Object.values(RECIPES).map(r=>`<div><b>${r.en}</b>${hintOn()?` <small>(${esc(r[S.set.hint])})</small>`:''}<br><span class="e">🍞 ${r.items.map(emo).join(' ')} 🍞</span></div>`).join('')}</div>`
+       :L.key==='veggie'?`<div class="recipes"><h4>🎨 Colors</h4>${Object.entries(COLOR_ITEMS).map(([c,its])=>`<div><b>${c}</b>${hintOn()?` <small>(${esc(V[c][S.set.hint])})</small>`:''}: ${its.map(emo).join(' ')}</div>`).join('')}<div>🚫 <b>no meat</b>: 🥩 🥓</div></div>`:''}
+   </div>
+  </div>`;
+}
+function tick(){
+  const now=performance.now(), dt=Math.min(1,(now-G.last)/1000); G.last=now;
+  if(G.paused||G.over) return;
+  G.time-=dt; renderTimer();
+  G.slots.forEach((c,i)=>{
+    if(!c){ if(G.spawnAt[i]!=null){ G.spawnAt[i]-=dt; if(G.spawnAt[i]<=0){ G.spawnAt[i]=null; if(G.spawned<DAY_CUSTOMERS) spawn(i); } } return; }
+    if(c.leaving) return;
+    c.p-=dt;
+    if(c.p<=0){ c.hearts--; c.p=perHeart(); if(c.hearts<=0) custLeaves(i); else renderCust(i); }
+  });
+  if(G.time<=0||(G.spawned>=DAY_CUSTOMERS&&G.slots.every(s=>!s))) endDay();
+}
+function renderTimer(){ const el=$('#timer'); if(!el) return; const s=Math.max(0,Math.ceil(G.time)); el.textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; el.classList.toggle('low',s<=20); }
+function spawn(i){
+  const look={img:CUSTS[G.lookI%3],flip:Math.floor(G.lookI/3)%2===1}; G.lookI++;
+  G.slots[i]={order:G.L.gen(),hearts:3,p:perHeart(),look,mood:'happy',num:G.spawned+1};
+  G.spawned++; renderCust(i);
+  if(G.sel<0||!G.slots[G.sel]||G.slots[G.sel].leaving) selectCust(i,G.sel>=0);
+}
+function renderAllCust(){ [0,1,2].forEach(renderCust); renderFor(); }
+function renderCust(i){
+  const el=$('#c'+i); if(!el) return; const c=G.slots[i];
+  if(!c){ el.className='cust empty'; el.innerHTML='🪑'; el.onclick=null; return; }
+  el.className='cust'+(G.sel===i?' sel':'')+(c.leaving?' leaving':'');
+  const showText=S.set.mode!=='listen';
+  el.innerHTML=`<span class="num">${c.num}</span><div class="bubble">${showText?esc(c.order.en):`<i class="muted">${t('listenTap')}</i>`}
+     ${hintOn()?`<div class="tr">${esc(c.order[S.set.hint])}</div>`:''}
+     <div class="tools"><button onclick="event.stopPropagation();say(G.slots[${i}].order.en)" aria-label="listen">🔊</button>${hasSR()?`<button onclick="event.stopPropagation();speakBack(${i})">🎤 ${t('say')}</button>`:''}</div></div>
+     <div class="face" style="position:relative"><img class="cface" src="${c.look.img}" alt="customer" style="${c.look.flip?'transform:scaleX(-1)':''}${c.mood==='angry'?';filter:saturate(.6) brightness(.9)':''}">${{angry:'<span class="mood">💢</span>',sad:'<span class="mood">💧</span>',joy:'<span class="mood">✨</span>'}[c.mood]||''}</div>
+     <div class="hearts">${[1,2,3].map(h=>`<span class="${h<=c.hearts?'':'lost'}">❤️</span>`).join('')}</div>`;
+  el.onclick=()=>selectCust(i);
+}
+function selectCust(i,quiet){
+  const c=G.slots[i]; if(!c||c.leaving) return;
+  const prev=G.sel; G.sel=i; [0,1,2].forEach(k=>{ const el=$('#c'+k); if(el&&G.slots[k]) el.classList.toggle('sel',k===i); });
+  renderFor();
+  if(!quiet||prev!==i){ if(S.set.mode!=='read') say(c.order.en); }
+}
+function renderFor(){ const el=$('#forlabel'); if(!el) return; const c=G.sel>=0&&G.slots[G.sel];
+  el.innerHTML=c&&!c.leaving?`👉 ${t('forCust')} <b>#${c.num}</b>`:t('tapCust'); }
+function custLeaves(i){
+  const c=G.slots[i]; c.leaving=true; c.mood='angry'; G.missed++; G.combo=0; updCombo(); sfx.buzz(); renderCust(i);
+  setTimeout(()=>{ if(!G||G.over) return; G.slots[i]=null; if(G.sel===i) G.sel=-1; G.spawnAt[i]=G.spawned<DAY_CUSTOMERS?2.5:null; renderCust(i);
+    if(G.sel<0){ const n=G.slots.findIndex(s=>s&&!s.leaving); if(n>=0) selectCust(n,true); } renderFor(); },1200);
+}
+/* building */
+function addIng(id){
+  if(!G||G.over||G.paused||!id) return;
+  const top=G.stack[G.stack.length-1];
+  if(top==='bunt'){ toast(t('full')); shake('#plate'); return; }
+  if(G.stack.length>=12){ shake('#plate'); return; }
+  const layer=id==='bun'?(G.stack.length===0?'bunb':'bunt'):id;
+  G.stack.push(layer); sfx.pop(); say(V[id].en); renderStack(true);
+}
+function undoIng(){ if(!G) return; G.stack.pop(); sfx.click(); renderStack(); }
+function clearIng(){ if(!G) return; G.stack=[]; sfx.click(); renderStack(); }
+function renderStack(anim){ const el=$('#stack'); if(el) el.innerHTML=layersHTML(G.stack,anim); }
+function shake(sel){ const el=$(sel); if(!el) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function updCombo(){ const el=$('#combo'); if(el) el.textContent=G.combo>=2?`🔥 ${t('combo')} x${G.combo}`:''; }
+function updCoins(){ document.querySelectorAll('.coinv').forEach(e=>e.textContent=S.coins); }
+function addCoins(n){ S.coins+=n; S.daily.coins+=n; updCoins(); save(); }
+
+function serve(){
+  if(!G||G.over||G.paused) return;
+  const c=G.sel>=0&&G.slots[G.sel];
+  if(!c||c.leaving){ toast(t('needCust')); return; }
+  if(!G.stack.length){ shake('#plate'); return; }
+  const res=checkOrder(c.order,G.stack);
+  const grade=res.m===0?'perfect':res.m===1?'good':'oops';
+  const made=[...G.stack];
+  // learning stats
+  c.order.words.forEach(w=>S.seen[w]=(S.seen[w]||0)+1);
+  res.bad.forEach(w=>{ if(V[w]) S.wrong[w]=(S.wrong[w]||0)+1; });
+  if(grade==='perfect') c.order.words.forEach(w=>{ if(S.wrong[w]) S.wrong[w]=Math.max(0,S.wrong[w]-.5); });
+  // coins
+  let coins=0;
+  if(grade!=='oops'){
+    G.combo=grade==='perfect'?G.combo+1:0;
+    coins=(grade==='perfect'?30:15)+c.hearts*5+menuCoins();
+    coins=Math.round(coins*(1+0.25*Math.min(Math.max(G.combo-1,0),4))*(1+tipPct()/100));
+  } else G.combo=0;
+  G.served++; S.daily.served++; if(grade==='perfect'){ G.perfect++; S.daily.perfect++; } if(grade==='good') G.good++;
+  G.coins+=coins; G.score+=coins+(grade==='perfect'?20:0); if(coins) addCoins(coins); else save();
+  updCombo();
+  c.mood=grade==='oops'?'sad':'joy'; c.leaving=true; renderCust(G.sel);
+  if(grade==='perfect'){ sfx.ding(); setTimeout(sfx.cash,250); confetti(); say('Perfect! Thank you!'); }
+  else if(grade==='good'){ sfx.ding(); say('Good job! Thank you!'); }
+  else { sfx.buzz(); say("Oops! Let's try again."); }
+  G.paused=true;
+  const ans=['bunb',...c.order.answer,'bunt'];
+  modal(`${grade==='perfect'?'<img class="bigburger" src="img/bigburger.webp" alt="">':''}<div class="grade ${grade}">${grade==='perfect'?'⭐ Perfect! ⭐':grade==='good'?'👍 Good!':'😅 Oops!'}</div>
+    <p class="center" style="margin:4px 0 8px">${t(grade+'Sub')}</p>
+    <div class="sent">🗣️ <b>${esc(c.order.en)}</b> <button class="btn" style="padding:2px 10px;font-size:15px" onclick="say(${esc(JSON.stringify(c.order.en))})">🔊</button>${hintOn()?`<div class="tr" style="color:#a2563a;margin-top:4px">${esc(c.order[S.set.hint])}</div>`:''}</div>
+    ${grade!=='perfect'?`<div><b>${t('orderWas')}</b><div class="chain">${chainHTML(ans)}<small>${ans.map(x=>x.startsWith('bun')?'bun':V[x].en).join(' + ')}</small></div></div>`:''}
+    <div><b>${t('youMade')}</b><div class="chain">${chainHTML(made)}</div></div>
+    ${coins?`<p class="center" style="font-size:24px;font-weight:700">+${coins} 🪙 ${G.combo>=2?`<span class="combo">🔥x${G.combo}</span>`:''}</p>`:''}
+    <div class="center"><button class="btn yellow" onclick="afterServe()">${t('next')} ➜</button></div>`,true);
+}
+function afterServe(){
+  closeModal(); if(!G) return;
+  const i=G.sel; G.slots[i]=null; G.sel=-1; G.stack=[]; renderStack();
+  G.spawnAt[i]=G.spawned<DAY_CUSTOMERS?1.8:null; renderCust(i);
+  G.paused=false; G.last=performance.now();
+  const n=G.slots.findIndex(s=>s&&!s.leaving); if(n>=0) selectCust(n); renderFor();
+}
+function endDay(){
+  if(G.over) return; G.over=true; clearInterval(G.iv); G.iv=null;
+  const rate=G.perfect/DAY_CUSTOMERS;
+  G.stars=rate>=.75?3:rate>=.5?2:(G.perfect+G.good)>=2?1:0;
+  S.stars[G.li]=Math.max(S.stars[G.li],G.stars);
+  if(G.stars>=1&&S.unlocked<G.li+2) S.unlocked=Math.min(LEVELS.length,G.li+2);
+  save(); toast(t('dayOver')); sfx.fanfare();
+  setTimeout(startQuiz,900);
+}
+
+/* ---------- SPEAKING BONUS (SpeechRecognition, if available) ---------- */
+function hasSR(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
+function speakBack(i){
+  const c=G.slots[i]; if(!c) return;
+  try{
+    const R=new (window.SpeechRecognition||window.webkitSpeechRecognition)(); R.lang='en-US'; R.interimResults=false; R.maxAlternatives=1;
+    toast('🎤 …'); R.onresult=e=>{
+      const said=e.results[0][0].transcript.toLowerCase(); const target=c.order.en.toLowerCase().replace(/[^a-z' ]/g,'').split(/\s+/).filter(Boolean);
+      const hit=target.filter(w=>said.includes(w)).length/target.length;
+      if(hit>=.6&&!c.spoke){ c.spoke=true; addCoins(20); sfx.cash(); toast(t('sayGood')); } else toast(t('sayTry')+` ("${said}")`);
+    };
+    R.onerror=()=>toast(t('micNo')); R.start();
+  }catch(e){ toast(t('micNo')); }
+}
+
+/* ---------- CONFETTI ---------- */
+function confetti(){ const cols=['#ffc93c','#e2474b','#5cbf3f','#7ec8f2','#ff8fc8','#fff']; for(let i=0;i<60;i++){ const d=document.createElement('div'); d.className='confetti';
+  d.style.left=Math.random()*100+'vw'; d.style.background=rnd(cols); d.style.animationDuration=(1.6+Math.random()*1.4)+'s'; d.style.animationDelay=(Math.random()*.4)+'s';
+  d.style.borderRadius=Math.random()>.5?'50%':'2px'; document.body.appendChild(d); setTimeout(()=>d.remove(),3500); } }
+
+/* =========================================================
+   MINI QUIZ (spaced repetition: missed words show up more)
+   ========================================================= */
+let Q=null;
+function startQuiz(){
+  const poolAll=VOCAB_LIST.map(v=>v[0]).filter(id=>G.L.pool.includes(V[id].cat));
+  let pool=poolAll.filter(id=>S.seen[id]); if(pool.length<4) pool=poolAll;
+  const picks=pickDistinct(pool,4);
+  Q={i:0,correct:0,qs:picks.map((ans,k)=>{ const type=['pic','word','listen'][k%3];
+     const opts=shuffle([ans,...shuffle(poolAll.filter(x=>x!==ans&&V[x].emoji!==V[ans].emoji)).slice(0,3)]); return {type,ans,opts,done:false}; })};
+  renderQuiz();
+}
+function renderQuiz(){
+  const q=Q.qs[Q.i], a=V[q.ans];
+  let head='';
+  if(q.type==='pic') head=`<p class="center"><b>${t('q1')}</b></p><div class="qbig">${a.emoji}</div>`;
+  else if(q.type==='word') head=`<p class="center"><b>${t('q2')}</b></p><div class="qword">${a.en} <button class="btn" style="padding:4px 12px" onclick="say('${a.en.replace(/'/g,"\\'")}')">🔊</button></div>`;
+  else head=`<p class="center"><b>${t('q3')}</b></p><div class="center"><button class="btn yellow big" onclick="say('${a.en.replace(/'/g,"\\'")}')">🔊</button></div>`;
+  const emoOpts=q.type!=='pic';
+  $('#root').innerHTML=`<div class="topbar"><span class="coinpill">🪙 <span class="coinv">${S.coins}</span></span><div class="spacer"></div><b>${Q.i+1} / ${Q.qs.length}</b></div>
+   <div class="title-row"><span class="ribbon">🧠 ${t('quiz')}</span></div>
+   <div class="panel" style="max-width:620px;margin:0 auto">${head}
+   <div class="opts">${q.opts.map(o=>`<button class="opt${emoOpts?' emo':''}" data-id="${o}" onclick="answerQuiz('${o}')">${emoOpts?V[o].emoji:V[o].en}</button>`).join('')}</div>
+   <div id="qnext" class="center" style="margin-top:14px"></div></div>`;
+  if(q.type!=='pic') setTimeout(()=>say(a.en),300);
+}
+function answerQuiz(id){
+  const q=Q.qs[Q.i]; if(q.done) return; q.done=true;
+  document.querySelectorAll('.opt').forEach(b=>{ if(b.dataset.id===q.ans) b.classList.add('right'); else if(b.dataset.id===id) b.classList.add('wrong'); });
+  const a=V[q.ans];
+  if(id===q.ans){ Q.correct++; sfx.ding(); addCoins(10); S.wrong[q.ans]=Math.max(0,(S.wrong[q.ans]||0)-1); }
+  else { sfx.buzz(); S.wrong[q.ans]=(S.wrong[q.ans]||0)+1; }
+  S.seen[q.ans]=(S.seen[q.ans]||0)+1; save(); say(a.en);
+  $('#qnext').innerHTML=`<div style="font-size:20px;margin-bottom:10px">${a.emoji} <b>${a.en}</b> <span class="muted">${a.ipa}</span>${hintOn()?` — ${esc(a[S.set.hint])}`:''} ${id===q.ans?'<span class="up">+10 🪙</span>':''}</div>
+     <button class="btn yellow" onclick="nextQuiz()">${t('next')} ➜</button>`;
+}
+function nextQuiz(){ Q.i++; if(Q.i>=Q.qs.length){ G.coins+=Q.correct*10; G.score+=Q.correct*10; renderResult(); } else renderQuiz(); }
+
+/* ---------- RESULTS ---------- */
+function renderResult(){
+  const next=G.li+1<LEVELS.length&&G.li+1<S.unlocked;
+  $('#root').innerHTML=`<div class="title-row" style="margin-top:10px"><span class="ribbon">🎉 ${t('results')}</span></div>
+  <div class="panel" style="max-width:680px;margin:0 auto">
+   <div class="center"><span class="ribbon small">${G.L.name}</span></div>
+   <div class="bigstars">${starsHTML(G.stars).replace('class="stars"','class="stars" style="font-size:64px"')}</div>
+   <div class="stat"><div>${t('score')}<b>${G.score}</b></div><div>${t('served')}<b>${G.served}</b></div><div>${t('perfects')}<b>${G.perfect}</b></div><div>${t('missed')}<b>${G.missed}</b></div><div>${t('coinsEarned')}<b>🪙 ${G.coins}</b></div><div>🧠 ${t('quiz')}<b>${Q.correct}/${Q.qs.length}</b></div></div>
+   <div class="center" id="savebox"><label class="lb">${t('yourName')}</label><input class="txt" id="pname" maxlength="16" value="${esc(S.name)}" placeholder="Chef">
+     <div style="margin-top:10px"><button class="btn green" onclick="saveScore()">💾 ${t('save')}</button></div></div>
+   <div class="ctrls" style="margin-top:18px">
+     <button class="btn" onclick="go('home')">🏠 ${t('home')}</button>
+     <button class="btn yellow" onclick="go('game',${G.li})">🔁 ${t('again')}</button>
+     ${next?`<button class="btn green" onclick="go('game',${G.li+1})">➜ ${t('nextLv')}</button>`:''}
+     <button class="btn" onclick="go('shop')">🏪 ${t('shop')}</button>
+   </div></div>`;
+  if(G.stars>=2) confetti();
+}
+function saveScore(){
+  const name=($('#pname').value||'Chef').trim().slice(0,16)||'Chef'; S.name=name;
+  S.board.push({name,score:G.score,level:G.L.name,stars:G.stars,date:today()}); S.board.sort((a,b)=>b.score-a.score); S.board=S.board.slice(0,10); save();
+  $('#savebox').innerHTML=`<b class="up">✅ ${t('saved')}</b> <button class="btn" onclick="go('board')">🏆 ${t('board')}</button>`; sfx.cash();
+}
+
+/* ---------- SHOP ---------- */
+function renderShop(cat){
+  const owned=SHOP.filter(s=>S.owned[s[0]]);
+  return header(t('shop'))+`<div class="shopgrid">
+   <div class="cafe" style="background:url(img/shopfront.webp) center top/cover"><div style="position:absolute;left:0;right:0;top:46%;display:flex;justify-content:center;gap:6px;font-size:34px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))">${owned.filter(s=>s[1]==='decoration'||s[1]==='menuCat').map(s=>V[s[0]].emoji).join('')}</div>
+     <div class="floor">${owned.filter(s=>s[1]==='furniture'||s[1]==='kitchen').map(s=>V[s[0]].emoji).join('')||'<span style="font-size:16px;opacity:.6">🛒 …</span>'}</div>
+     <span class="sparkle" style="left:12%;top:14%">✦</span><span class="sparkle" style="right:12%;top:30%;animation-delay:.7s">✦</span></div>
+   <div class="panel">
+     <div class="tabs">${['furniture','kitchen','decoration','menuCat'].map(c=>`<button class="${c===cat?'on':''}" onclick="go('shop','${c}')">${{furniture:'🛋️',kitchen:'🍳',decoration:'🪴',menuCat:'🍔'}[c]} ${t(c)}${ownedIn(c)?` <span class="up">↑${ownedIn(c)}</span>`:''}</button>`).join('')}</div>
+     <p class="muted" style="margin:0 0 8px">⬆ ${t(EFFECT[cat])}</p>
+     ${SHOP.filter(s=>s[1]===cat).map(([id,,price])=>{ const v=V[id], own=S.owned[id];
+       return `<div class="item"><div class="e">${v.emoji}</div><div class="info"><b>${v.en}</b> <button class="btn" style="padding:0 8px;font-size:13px" onclick="say('${v.en}')">🔊</button><small>${v.ipa}${hintOn()?' · '+esc(v[S.set.hint]):''}</small></div>
+         ${own?`<span class="up">✔ ${t('owned')}</span>`:`<button class="btn yellow" onclick="buy('${id}','${cat}')">🪙 ${price}</button>`}</div>`; }).join('')}
+   </div></div>`;
+}
+function buy(id,cat){
+  const it=SHOP.find(s=>s[0]===id); if(S.owned[id]) return;
+  if(S.coins<it[2]){ toast(t('notEnough')); sfx.buzz(); return; }
+  S.coins-=it[2]; S.owned[id]=true; S.seen[id]=(S.seen[id]||0)+1; save(); sfx.cash(); confetti();
+  const v=V[id]; go('shop',cat); say(`${v.en}. ${v.en}!`);
+  modal(`<div class="center"><span class="ribbon small">✨ ${t('newWord')}</span><div class="qbig">${v.emoji}</div><div class="qword">${v.en}</div>
+   <p class="muted">${v.ipa}</p><p style="font-size:18px">🇹🇭 ${esc(v.th)} &nbsp; 🇨🇳 ${esc(v.zh)}</p>
+   <button class="btn" onclick="say('${v.en}')">🔊</button> <button class="btn yellow" onclick="closeModal()">OK</button></div>`);
+}
+
+/* ---------- DAILY CHALLENGE ---------- */
+function dailyDone(){ checkDaily(); return S.daily.served>=10&&S.daily.perfect>=3&&S.daily.coins>=500; }
+function renderDaily(){
+  checkDaily(); const d=S.daily;
+  const goals=[[t('g1'),d.served,10],[t('g2'),d.perfect,3],[t('g3'),d.coins,500]];
+  const done=dailyDone();
+  return header(t('daily'))+`<div class="panel" style="max-width:640px;margin:0 auto">
+   ${goals.map(([txt,v,max])=>`<div class="goal"><div class="chk ${v>=max?'ok':''}">${v>=max?'✔':''}</div><div style="flex:1">${txt}<div class="prog"><i style="width:${Math.min(100,v/max*100)}%"></i></div></div><span>${Math.min(v,max)}/${max}</span></div>`).join('')}
+   <img class="giftimg" src="img/gift.webp" alt="gift">
+   <div class="center">${d.claimed?`<b class="up">${t('claimed')}</b>`:`<button class="btn ${done?'yellow':''}" ${done?'':'disabled'} onclick="claimGift()">🎁 ${t('claim')}</button>`}</div></div>`;
+}
+function claimGift(){ if(!dailyDone()||S.daily.claimed) return; S.daily.claimed=true; S.coins+=200; save(); sfx.fanfare(); confetti(); go('daily'); }
+
+/* ---------- WORD BOOK ---------- */
+function renderWords(){
+  const cats=['food','num','phrase','color','adj','shop'];
+  const n=Object.keys(S.seen).filter(k=>V[k]).length;
+  return header(t('words'),`<b>${n}/${VOCAB_LIST.length} ${t('learned')}</b>`)+`<div class="panel">${cats.map(c=>`<h3 class="cat">${t('cat_'+c)}</h3><div class="words">${
+    VOCAB_LIST.filter(v=>v[6]===c).map(([id])=>{ const v=V[id];
+      return S.seen[id]?`<div class="wcard${(S.wrong[id]||0)>=2?' weak':''}" onclick="say('${v.en.replace(/'/g,"\\'")}')"><div class="e">${v.emoji}</div><b>${v.en} 🔊</b><div class="ipa">${v.ipa}</div><div class="tr">🇹🇭 ${esc(v.th)}<br>🇨🇳 ${esc(v.zh)}</div></div>`
+        :`<div class="wcard locked"><div class="e">❓</div><b>? ? ?</b></div>`; }).join('')}</div>`).join('')}</div>`;
+}
+
+/* ---------- LEADERBOARD ---------- */
+function renderBoard(){
+  return header('🏆 '+t('board'))+`<div class="panel" style="max-width:640px;margin:0 auto">${S.board.length?`<table class="lb"><tr><th>${t('rank')}</th><th>${t('name')}</th><th>${t('level')}</th><th>${t('score')}</th></tr>
+   ${S.board.map((r,i)=>`<tr><td>${['🥇','🥈','🥉'][i]||i+1}</td><td>${esc(r.name)}</td><td>${esc(r.level)} ${starsHTML(r.stars||0)}</td><td><b>${r.score}</b></td></tr>`).join('')}</table>`
+   :`<p class="center" style="font-size:20px">${t('noScores')}</p><div class="center"><button class="btn yellow" onclick="go('menu')">▶ ${t('play')}</button></div>`}</div>`;
+}
+
+/* ---------- MODALS: generic / settings / how-to ---------- */
+let modalLocked=false;
+function modal(html,locked){ $('#modalBox').innerHTML=html; $('#modal').classList.add('show'); modalLocked=!!locked; }
+function closeModal(){ $('#modal').classList.remove('show'); modalLocked=false; }
+$('#modal').addEventListener('click',e=>{ if(e.target.id==='modal'&&!modalLocked) closeModal(); });
+function seg(key,opts){ return `<div class="seg">${opts.map(([v,l])=>`<button class="${S.set[key]===v?'on':''}" onclick="setOpt('${key}',${JSON.stringify(v).replace(/"/g,'&quot;')})">${l}</button>`).join('')}</div>`; }
+function openSettings(){
+  const was=G&&G.iv&&!G.over&&!G.paused; if(was) G.paused=true;
+  modal(`<div class="center" style="margin-bottom:10px"><span class="ribbon small">⚙️ ${t('settings')}</span></div>
+   <label class="lb">🌐 ${t('ui')}</label>${seg('ui',[['en','English'],['th','ไทย'],['zh','中文']])}
+   <label class="lb">🎧 ${t('mode')}</label>${seg('mode',[['listen','👂 '+t('listen')],['read','👀 '+t('read')],['both','👂👀 '+t('both')]])}
+   <label class="lb">💬 ${t('hint')}</label>${seg('hint',[['th','ไทย'],['zh','中文'],['off',t('off')]])}
+   <label class="lb">🗣️ ${t('speed')}</label>${seg('slow',[[true,'🐢 '+t('slow')],[false,'🐇 '+t('normal')]])}
+   <label class="lb">🎵 ${t('music')}</label>${seg('music',[[true,t('on')],[false,t('off')]])}
+   <label class="lb">🔔 ${t('sfx')}</label>${seg('sfx',[[true,t('on')],[false,t('off')]])}
+   <div class="center"><button class="btn yellow" onclick="closeSettings()">${t('close')}</button></div>`,true);
+  openSettings.resume=was;
+}
+function setOpt(k,v){ S.set[k]=v; save(); if(k==='music'){ v?startMusic():stopMusic(); } const r=openSettings.resume; openSettings(); openSettings.resume=r; }
+function closeSettings(){
+  closeModal();
+  if(CUR==='game'&&G&&!G.over){ // re-render game UI for new language / hint settings
+    $('#root').innerHTML=renderGame(); renderAllCust(); renderStack(); renderTimer(); updCombo();
+    if(openSettings.resume){ G.paused=false; G.last=performance.now(); }
+  } else if(CUR!=='game') go(CUR);
+}
+function openHow(){
+  modal(`<div class="center" style="margin-bottom:10px"><span class="ribbon small">📖 ${t('how')}</span></div>
+   <ol style="font-size:17px;line-height:1.6;padding-left:22px">${t('howSteps').map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+   <div class="center" style="font-size:30px;margin:6px 0">🍞 ➜ 🥩 ➜ 🧀 ➜ 🥬 ➜ 🍞 ➜ ✔</div>
+   <div class="center"><button class="btn yellow" onclick="closeModal()">OK!</button></div>`);
+}
+
+/* ---------- BOOT ---------- */
+load();
+document.documentElement.lang=S.set.ui;
+go('home');
+</script>
+</body>
+</html>
